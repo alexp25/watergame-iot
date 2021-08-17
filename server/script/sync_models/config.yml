@@ -1,0 +1,13 @@
+path: ../../src/database/models
+associations: "../../src/database/associations.ts"
+outputFullSpecs: ../../src/database/models-ts.ts
+outputModels: "../../src/classes/global/db-collection.ts"
+datatypes: 
+  - ["BIGINT", "number"]
+  - ["INTEGER", "number"]
+  - ["STRING", "string"]
+  - ["FLOAT", "number"]
+  - ["DOUBLE", "number"]
+  - ["BOOLEAN", "boolean"]
+  - ["DATE", "Date"]
+  - ["DECIMAL", "number"]

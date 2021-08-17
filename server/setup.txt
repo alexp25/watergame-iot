@@ -1,0 +1,23 @@
+## typeorm
+
+generate models from database schema
+
+npm i -g typeorm-model-generator
+
+typeorm-model-generator -h DATABASE -d SCHEMA -u admin -x PASS -e mysql -o ./src
+
+# sequelize-auto -o "./src/database/models" -C -d SCHEMA -h DATABASE -u admin -p 3306 -x PASS -e mysql
+
+
+
+use git bash to run server (it's using cp command to copy assets)
+
+
+
+replace snake_case to camelCase
+
+find: find (_[a-z])
+
+command pallete: select all occurences to find match (ctrl+shift+L)
+command pallete: to uppercase
+remove underscore: back arrow, delete 

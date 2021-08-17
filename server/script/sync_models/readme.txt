@@ -1,0 +1,2 @@
+load_models.sh
+sync_models_ts.sh

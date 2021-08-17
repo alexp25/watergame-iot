@@ -1,0 +1,27 @@
+
+MQTT_BROKER:
+  LOCAL:
+    URL: 192.168.1.150
+    PORT: 1883
+    USER: "pi"
+    PASS: "raspberry"
+    CLIENT: "proxy_one"
+  CLOUD:
+    URL: ec2-18-159-69-145.eu-central-1.compute.amazonaws.com
+    PORT: 1883
+    USER: "pi"
+    PASS: "raspberry"
+    CLIENT: "proxy_one"
+MAPPING:
+  - DIRECTION: "LOCAL_SEND"
+    LOCAL: "data"
+    CLOUD: "wsn/watergame/realtime"
+  - DIRECTION: "LOCAL_RECEIVE"
+    LOCAL: "cmd"
+    CLOUD: "wsn/watergame/cmd"
+  - DIRECTION: "LOCAL_SEND"
+    LOCAL: "test_local_send"
+    CLOUD: "test_local_send_echo"
+  - DIRECTION: "LOCAL_RECEIVE"
+    LOCAL: "test_local_receive_echo"
+    CLOUD: "test_local_receive"

@@ -1,0 +1,7 @@
+path: ../../src
+extensions: 
+    - .ts
+    - .js  
+exclude_folders:
+   - .git
+   

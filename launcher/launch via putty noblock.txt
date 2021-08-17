@@ -1,0 +1,3 @@
+
+send process to bg
+ctrl + z

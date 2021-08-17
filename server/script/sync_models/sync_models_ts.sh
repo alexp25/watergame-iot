@@ -1,0 +1,1 @@
+py -3 sync_models_ts.py

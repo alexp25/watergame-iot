@@ -1,0 +1,1 @@
+sequelize-auto -o "../../src/database/models" -C -d mqtt_charts -h 192.168.1.150 -u pi -p 3306 -x raspberry -e mysql
