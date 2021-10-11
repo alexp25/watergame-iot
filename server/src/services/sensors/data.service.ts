@@ -1,14 +1,23 @@
 import { Injectable } from "@nestjs/common";
 import { DatabaseService } from "../database.service";
 import { Order } from "sequelize";
-import { IDBModelSensorData, IDBModelTopic } from "../../database/models-ts";
+import { IDBModelSensorData } from "../../database/models-ts";
 import { MQTTUtilsService, ICsvSensorData } from "../mqtt/utils.service";
 import { SensorsManagerService } from "./manager.service";
+import { Op } from "sequelize";
+import { IFindOptionsExt } from "../../classes/global/db";
 
 const converter = require('json-2-csv');
 export interface ISensorDataPacked {
     data: any[],
     keys: string[]
+}
+
+export enum ESensorDataQueryMode {
+    lastCount = 1,
+    lastTimeSecond = 2,
+    lastTimeHour = 3,
+    timeFrame = 4
 }
 
 @Injectable()
@@ -22,9 +31,9 @@ export class SensorsDataService {
 
     }
 
-    getSensorDataProcessedCsv(sensorId: number, chan: number, limit: number): Promise<string> {
+    getSensorDataProcessedCsv(sensorId: number, chan: number, mode: number, limit: number, startDateString: string, endDateString: string): Promise<string> {
         return new Promise((resolve, reject) => {
-            this.getSensorDataProcessed(sensorId, chan, limit).then((packedData: ISensorDataPacked) => {
+            this.getSensorDataProcessed(sensorId, chan, mode, limit, startDateString, endDateString).then((packedData: ISensorDataPacked) => {
 
                 // already sorted
                 let opts = {
@@ -45,9 +54,9 @@ export class SensorsDataService {
     }
 
 
-    getSensorDataProcessed(sensorId: number, chan: number, limit: number): Promise<ISensorDataPacked> {
+    getSensorDataProcessed(sensorId: number, chan: number, mode: number, limit: number, startDateString: string, endDateString: string): Promise<ISensorDataPacked> {
         return new Promise((resolve, reject) => {
-            this.getSensorData(sensorId, chan, limit).then((data: IDBModelSensorData[]) => {
+            this.getSensorData(sensorId, chan, mode, limit, startDateString, endDateString).then((data: IDBModelSensorData[]) => {
 
                 let packedData = [];
                 let tsCrt = null;
@@ -107,13 +116,17 @@ export class SensorsDataService {
     /**
      * get all users with pagination
      */
-    getSensorData(sensorId: number, chan: number, limit: number): Promise<IDBModelSensorData[]> {
+    getSensorData(sensorId: number, chan: number, mode: number, limit: number, startDateString: string, endDateString: string): Promise<IDBModelSensorData[]> {
         let promise: Promise<IDBModelSensorData[]> = new Promise((resolve, reject) => {
             if (!sensorId) {
                 reject("unexpected request parameter");
                 return;
             }
-            let offset: number = 0;
+            // let offset: number = 0;
+            let dateStart: Date;
+            let dateEnd: Date = new Date();
+            let timeEnd: number = dateEnd.getTime();
+            let timeStart: number = dateStart != null ? dateStart.getTime() : null;
 
             let order: Order = [
                 ["timestamp", "DESC"]
@@ -127,17 +140,56 @@ export class SensorsDataService {
                 where.chan = chan;
             }
 
-            if (!limit) {
-                limit = 1000;
+            let withInterval: boolean = false;
+
+            if (mode != null && !Number.isNaN(mode)) {
+                switch (mode) {
+                    case ESensorDataQueryMode.lastTimeSecond:
+                        if (!timeStart) {
+                            timeStart = timeEnd - limit * 1000;
+                        }
+                        withInterval = true;
+                        break;
+                    case ESensorDataQueryMode.lastTimeHour:
+                        if (!timeStart) {
+                            timeStart = timeEnd - limit * 3600 * 1000;
+                        }
+                        withInterval = true;
+                        break;
+                    case ESensorDataQueryMode.timeFrame:
+                        dateStart = new Date(startDateString);
+                        dateEnd = new Date(endDateString);
+                        if (dateEnd <= dateStart) {
+                            reject(new Error("incorrect timeframe specification"));
+                            return;
+                        }
+                        timeStart = dateStart.getTime();
+                        timeEnd = dateEnd.getTime();
+                        withInterval = true;
+                        break;
+                }
+            }
+
+            if (withInterval) {
+                where.timestamp = {
+                    [Op.between]: [new Date(timeStart), new Date(timeEnd)]
+                } as any;
+            }
+
+            let opts: IFindOptionsExt = {
+                where: where as any,
+                // offset: offset,
+                order: order
+            };
+
+            if (!withInterval) {
+                if (limit != null && !Number.isNaN(limit)) {
+                    opts.limit = limit;
+                }
             }
 
             this.dbs.run(
-                this.dbs.db.sensorData.findAll({
-                    where: where as any,
-                    offset: offset,
-                    limit: limit,
-                    order: order
-                })).then((data: IDBModelSensorData[]) => {
+                this.dbs.db.sensorData.findAll(opts)).then((data: IDBModelSensorData[]) => {
                     if (!data) {
                         reject(new Error("error loading data"));
                         return;

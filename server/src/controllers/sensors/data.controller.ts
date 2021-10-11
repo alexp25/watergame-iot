@@ -20,10 +20,26 @@ export class IApiGetDataRequest extends IApiGenericRequest {
     })
     chan: number;
     @ApiModelProperty({
+        example: 1,
+        default: 1,
+        required: false
+    })
+    mode: number;
+    @ApiModelProperty({
         example: 1000,
         default: 1000
     })
     limit: number;
+    @ApiModelProperty({
+        example: "2021-10-09 19:50:00",
+        default: "2021-10-09 19:50:00"
+    })
+    startDate: string;
+    @ApiModelProperty({
+        example: "2021-10-10 19:50:00",
+        default: "2021-10-10 19:50:00"
+    })
+    endDate: string;
 }
 
 @ApiUseTags('sensors/data')
@@ -48,7 +64,10 @@ export class SensorsDataController {
         this.genericRequest.run(this.sensors.getSensorData(
             body.sensorId,
             body.chan,
-            body.limit
+            body.mode,
+            body.limit,
+            body.startDate,
+            body.endDate
         )).then((resp: IGenericResponseWrapper<any>) => {
             res.status(resp.status).json(resp.resp);
         }).catch((errorResp: IGenericResponseWrapper<any>) => {
@@ -66,7 +85,10 @@ export class SensorsDataController {
         this.genericRequest.run(this.sensors.getSensorData(
             Number.parseInt(query.sensorId as any),
             Number.parseInt(query.chan as any),
-            Number.parseInt(query.limit as any)
+            Number.parseInt(query.mode as any),
+            Number.parseInt(query.limit as any),
+            query.startDate,
+            query.endDate
         )).then((resp: IGenericResponseWrapper<any>) => {
             res.status(resp.status).json(resp.resp);
         }).catch((errorResp: IGenericResponseWrapper<any>) => {
@@ -84,7 +106,10 @@ export class SensorsDataController {
         this.genericRequest.run(this.sensors.getSensorDataProcessed(
             Number.parseInt(query.sensorId as any),
             Number.parseInt(query.chan as any),
-            Number.parseInt(query.limit as any)
+            Number.parseInt(query.mode as any),
+            Number.parseInt(query.limit as any),
+            query.startDate,
+            query.endDate
         )).then((resp: IGenericResponseWrapper<any>) => {
             res.status(resp.status).send(resp.resp.data);
         }).catch((errorResp: IGenericResponseWrapper<any>) => {
@@ -102,7 +127,10 @@ export class SensorsDataController {
         this.genericRequest.run(this.sensors.getSensorDataProcessedCsv(
             Number.parseInt(query.sensorId as any),
             Number.parseInt(query.chan as any),
-            Number.parseInt(query.limit as any)
+            Number.parseInt(query.mode as any),
+            Number.parseInt(query.limit as any),
+            query.startDate,
+            query.endDate
         )).then((resp: IGenericResponseWrapper<any>) => {
             res.setHeader("Content-Type", "text/csv");
             res.setHeader("Content-Disposition", "attachment; filename=download.csv");
@@ -123,7 +151,10 @@ export class SensorsDataController {
         this.genericRequest.run(this.sensors.getSensorDataProcessedCsv(
             Number.parseInt(query.sensorId as any),
             Number.parseInt(query.chan as any),
-            Number.parseInt(query.limit as any)
+            Number.parseInt(query.mode as any),
+            Number.parseInt(query.limit as any),
+            query.startDate,
+            query.endDate
         )).then((resp: IGenericResponseWrapper<any>) => {
             res.setHeader("Content-Type", "text/plain");
             // res.setHeader("Content-Disposition", "attachment; filename=download.csv");
