@@ -30,6 +30,59 @@ export class IApiSetCoordsRequest extends IApiGenericRequest {
     lng: number;
 }
 
+export class IApiCheckDataRequest extends IApiGenericRequest {
+    @ApiModelProperty({
+        example: 1,
+        default: 1
+    })
+    sensorId: number;
+    @ApiModelProperty({
+        example: 1,
+        default: 1,
+        required: false
+    })
+    chan: number;
+    @ApiModelProperty({
+        example: 1000,
+        default: 1000
+    })
+    limit: number;
+    @ApiModelProperty({
+        example: "2021-10-09 19:50:00",
+        default: "2021-10-09 19:50:00"
+    })
+    startDate: string;
+    @ApiModelProperty({
+        example: "2021-10-10 19:50:00",
+        default: "2021-10-10 19:50:00"
+    })
+    endDate: string;
+    @ApiModelProperty({
+        example: 0,
+        default: 0
+    })
+    batch: number;
+    @ApiModelProperty({
+        example: false,
+        default: false
+    })
+    timeframe: boolean;
+    @ApiModelProperty({
+        example: 5000,
+        default: 5000
+    })
+    timeout: number;
+    @ApiModelProperty({
+        example: 1000,
+        default: 1000
+    })
+    batchSize: number;
+    @ApiModelProperty({
+        example: 10,
+        default: 10
+    })
+    devFactor: number;
+}
 
 @ApiUseTags('sensors/manager')
 // @UseGuards(JWTAuthService)
@@ -78,6 +131,30 @@ export class SensorsManagerController {
     })
     async getTopicsWGet(@Res() res: Response, @Query() query: IApiGenericRequest) {
         this.genericRequest.run(this.sensors.getTopics()).then((resp: IGenericResponseWrapper<any>) => {
+            res.status(resp.status).json(resp.resp);
+        }).catch((errorResp: IGenericResponseWrapper<any>) => {
+            res.status(errorResp.status).json(errorResp.resp);
+        });
+    }
+
+    @Post('check-sensor-timeframes')
+    @ApiResponse({
+        status: 200,
+        description: 'Check sensor timeframes',
+        type: null,
+    })
+    async checkSensorTimeframes(@Res() res: Response, @Body() body: IApiCheckDataRequest) {
+        this.genericRequest.run(this.sensors.checkSensorTimeframes(
+            body.sensorId,
+            body.chan,
+            body.batchSize,
+            body.limit,
+            body.timeframe,
+            body.timeout,
+            body.startDate,
+            body.endDate,
+            body.devFactor
+        )).then((resp: IGenericResponseWrapper<any>) => {
             res.status(resp.status).json(resp.resp);
         }).catch((errorResp: IGenericResponseWrapper<any>) => {
             res.status(errorResp.status).json(errorResp.resp);
