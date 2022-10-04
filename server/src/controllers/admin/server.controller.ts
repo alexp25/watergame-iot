@@ -6,6 +6,8 @@ import { GenericRequestService } from '../../services/generic-request.service';
 import { IApiGenericRequest } from '../../classes/generic/request';
 import { RedisCacheService } from '../../services/cache/redis.service';
 import { MQTTCoreService } from '../../services/mqtt/core.service';
+import { PrometheusService } from '../../classes/prometheus/prometheus.service';
+import { Gauge } from 'prom-client';
 
 export class IApiGetKeyRequest extends IApiGenericRequest {
     @ApiModelProperty({
@@ -20,11 +22,17 @@ export class IApiGetKeyRequest extends IApiGenericRequest {
 // @ApiBearerAuth()
 @Controller('admin/server')
 export class AdminServerController {
+    private testGauge: Gauge;
+
     constructor(
         private genericRequest: GenericRequestService,
         private redisCache: RedisCacheService,
-        private mqtt: MQTTCoreService
-    ) { }
+        private mqtt: MQTTCoreService,
+        private prometheusService: PrometheusService
+    ) { 
+        this.testGauge = prometheusService.registerGauge("number_accessed", "this represents access number of this endpoint", ["endpoint"]);
+        this.testGauge.set(0)
+    }
 
 
     @Get('check-redis-connection')
@@ -62,6 +70,7 @@ export class AdminServerController {
         type: null,
     })
     async checkMQTTConnection(@Res() res: Response) {
+        this.testGauge.inc({endpoint: 'check-mqtt-connection'})
         this.genericRequest.run(this.mqtt.testConnection()).then((resp: IGenericResponseWrapper<any>) => {
             res.status(resp.status).json(resp.resp);
         }).catch((errorResp: IGenericResponseWrapper<any>) => {
