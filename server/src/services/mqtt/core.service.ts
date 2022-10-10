@@ -3,6 +3,8 @@ import { Config, IMQTTSubTopic } from "../../classes/global/config";
 import { MQTTCacheService } from "./cache.service";
 import { MQTTUtilsService, ICsvSensorData } from "./utils.service";
 import { SensorsDataService } from "../sensors/data.service";
+import { PrometheusService } from "../../classes/prometheus/prometheus.service";
+import { Gauge } from "prom-client";
 
 const mqtt = require('mqtt')
 
@@ -56,16 +58,18 @@ export class MQTTCoreService {
 
     client: any;
 
-    debug: boolean = false;
+    debug: boolean = true;
     lastMQTTStateLog: string = "";
     connected: boolean = false;
+    private heartBeatGauge: Gauge;
 
     constructor(
         private cache: MQTTCacheService,
         private utils: MQTTUtilsService,
+        private prometheusService: PrometheusService,
         public sd: SensorsDataService
     ) {
-
+        this.heartBeatGauge = prometheusService.registerGauge("heart_beat", "timestamp last heartbeat was received", ["sensor_id"]);
     }
 
     connect() {
@@ -98,6 +102,7 @@ export class MQTTCoreService {
             message = message.toString();
             if (this.debug)
                 console.log('received message via topic: ', topic, " - ", message);
+            this.checkHeartBeat(topic, message)
             this.checkUpdateCache(topic, message);
             if (Config.env.mqtt.record) {
                 this.checkRecorder(topic, message);
@@ -166,4 +171,21 @@ export class MQTTCoreService {
             }
         }
     }
-}; 
+
+    checkHeartBeat(topic: string, message: string) {
+        let subTopics: IMQTTSubTopic[] = Config.env.mqtt.topics.sub;
+        let subTopic: IMQTTSubTopic = subTopics.find(el => el.topic === topic);
+        if (subTopic) {
+            if (subTopic.heartbeat) {
+                let csv: ICsvSensorData = this.utils.getCsvData(message);
+                if (csv != null) {
+                    if (this.debug)
+                        console.log("heartbeat from sensor id: ", csv.sensorId);
+                    this.heartBeatGauge.set({sensor_id: csv.sensorId}, Date.now())
+                }
+                else if (this.debug)
+                    console.log("heartbeat, but message cannot be parsed: ", message);
+            }
+        }
+    }
+};

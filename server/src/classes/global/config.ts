@@ -31,7 +31,8 @@ export interface IConfigEnv {
 export interface IMQTTSubTopic {
     topic: string,
     record: boolean,
-    cache: boolean
+    cache: boolean,
+    heartbeat: boolean
 }
 
 export interface IConfigData {
