@@ -44,6 +44,7 @@
     "mysql2": "^1.7.0",
     "nest-winston": "^1.1.2",
     "node-fetch": "^2.6.1",
+    "prom-client": "^14.1.0",
     "redis": "^3.0.2",
     "reflect-metadata": "^0.1.13",
     "request-promise-native": "^1.0.7",
