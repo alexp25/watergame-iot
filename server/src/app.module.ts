@@ -22,6 +22,7 @@ import { AdminServerController } from './controllers/admin/server.controller';
 import { MetricsService } from './classes/prometheus/metrics.service';
 import { PrometheusService } from './classes/prometheus/prometheus.service';
 import { MetricsController } from './controllers/metrics/metrics.controller';
+import { AlertsController } from './controllers/alerts/alerts.controller';
 import { ExtApiAirlyDataService } from './services/extapi/airly.service';
 import { ExtApiDataController } from './controllers/extapi/data.controller';
 
@@ -34,7 +35,8 @@ import { ExtApiDataController } from './controllers/extapi/data.controller';
     SensorsManagerController,
     AdminServerController,
     MetricsController,
-    ExtApiDataController
+    ExtApiDataController,
+    AlertsController
   ],
   providers: [
     AppService,

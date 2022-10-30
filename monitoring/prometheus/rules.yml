@@ -1,0 +1,21 @@
+groups:
+  - name: watchdog
+    rules:
+    - alert: Watchdog
+      expr: vector(1)
+      labels:
+        severity: watchdog
+      annotations:
+        summary: "Watchdog"
+        description: "This alert should be always triggered"
+  - name: heartbeat
+    rules:
+    - record: hb:time_since_last_seconds
+      expr: (time()*1000 - last_over_time(heart_beat[365d]))/1000
+    - alert: SensorDown
+      expr: hb:time_since_last_seconds > 5*60
+      labels:
+        severity: CRITICAL
+      annotations:
+        summary: "Sensor {{ $labels.sensor_id }} down"
+        description: "Sensor with id {{ $labels.sensor_id }} have sent last heartbeat more than 5 minutes ago."
