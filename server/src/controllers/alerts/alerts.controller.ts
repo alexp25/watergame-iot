@@ -13,7 +13,7 @@ const axios = require('axios').default
 const SUMMARY_ANNOTATION = "summary"
 const DESCRIPTION_ANNOTATION = "description"
 const NOTIFICATIONS_COLLECTION = "notifications"
-const ALERT_PREFIX = "[SYS ALERT]"
+const ALERT_PREFIX = "[SYS ALERT] "
 
 enum Status {
     FIRING = "firing",
