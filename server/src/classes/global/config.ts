@@ -2,6 +2,7 @@
 
 
 export interface IConfigEnv {
+    firebaseUrl: String,
     db: {
         dbhost: string,
         dbuser: string,
