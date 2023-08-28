@@ -7,6 +7,7 @@ export interface IDBModelSensor {
   timestamp?: Date,
   lat?: number,
   lng?: number,
+  online?: number,
   sensorDatas?: IDBModelSensorData[],
   topic?: IDBModelTopic
 }

@@ -2,10 +2,13 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AppService {
-  getHello(id: number): Promise<any> {
-    let promise: Promise<any> = new Promise((resolve, reject) => {
+  counter: number = 0;
+  getHello(): Promise<any> {
+    let promise: Promise<any> = new Promise((resolve) => {
+      let message: string = "Hello world! counter: " + this.counter;
+      this.counter += 1;
       resolve({
-        message: "Hello world! id: " + id
+        message: message
       });
     });
     return promise;

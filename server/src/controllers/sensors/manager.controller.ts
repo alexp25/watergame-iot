@@ -13,6 +13,11 @@ export class IApiGetAllSensorsRequest extends IApiGenericRequest {
         default: 1
     })
     type: number;
+    @ApiModelProperty({
+        example: true,
+        default: true
+    })
+    online: boolean;
 }
 
 export class IApiSetCoordsRequest extends IApiGenericRequest {
@@ -95,20 +100,6 @@ export class SensorsManagerController {
     ) { }
 
 
-    @Post('get-registered-sensors')
-    @ApiResponse({
-        status: 200,
-        description: 'Get all sensors',
-        type: null,
-    })
-    async getAllSensors(@Res() res: Response, @Body() body: IApiGetAllSensorsRequest) {
-        this.genericRequest.run(this.sensors.getSensors(body.type)).then((resp: IGenericResponseWrapper<any>) => {
-            res.status(resp.status).json(resp.resp);
-        }).catch((errorResp: IGenericResponseWrapper<any>) => {
-            res.status(errorResp.status).json(errorResp.resp);
-        });
-    }
-
     @Get('get-registered-sensors')
     @ApiResponse({
         status: 200,
@@ -116,7 +107,7 @@ export class SensorsManagerController {
         type: null,
     })
     async getDataWGet(@Res() res: Response, @Query() query: IApiGetAllSensorsRequest) {
-        this.genericRequest.run(this.sensors.getSensors(Number.parseInt(query.type as any))).then((resp: IGenericResponseWrapper<any>) => {
+        this.genericRequest.run(this.sensors.getSensors(Number.parseInt(query.type as any), (query.online as any) === "true")).then((resp: IGenericResponseWrapper<any>) => {
             res.status(resp.status).json(resp.resp);
         }).catch((errorResp: IGenericResponseWrapper<any>) => {
             res.status(errorResp.status).json(errorResp.resp);

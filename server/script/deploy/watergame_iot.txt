@@ -1,0 +1,15 @@
+[Unit]
+Description=hello_env.js - making your environment variables rad
+Documentation=https://example.com
+After=network.target
+
+[Service]
+Environment=NODE_ENV=production
+Environment=PORT=8081
+Type=simple
+User=ubuntu
+ExecStart=/usr/bin/node /home/ubuntu/watergame_iot/dist/main.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

@@ -48,6 +48,10 @@ module.exports = function (sequelize, DataTypes) {
       type: "DOUBLE",
       allowNull: true,
       field: 'lng'
+    },
+    online: {
+      type: DataTypes.INTEGER(11),
+      allowNull: true
     }
   }, {
     tableName: 'sensor'

@@ -20,17 +20,19 @@ import { MQTTCacheService } from './services/mqtt/cache.service';
 import { MQTTUtilsService } from './services/mqtt/utils.service';
 import { AdminServerController } from './controllers/admin/server.controller';
 import { MetricsService } from './classes/prometheus/metrics.service';
-import { PrometheusService } from './classes/prometheus/prometheus.service';
+// import { PrometheusService } from './classes/prometheus/prometheus.service';
 import { MetricsController } from './controllers/metrics/metrics.controller';
 import { AlertsController } from './controllers/alerts/alerts.controller';
 import { ExtApiAirlyDataService } from './services/extapi/airly.service';
 import { ExtApiDataController } from './controllers/extapi/data.controller';
+import { ServerController } from './controllers/app.controller';
 
 @Module({
   imports: [
     HttpModule
   ],
   controllers: [
+    ServerController,
     SensorsDataController,
     SensorsManagerController,
     AdminServerController,
@@ -57,8 +59,8 @@ import { ExtApiDataController } from './controllers/extapi/data.controller';
     MQTTCoreService,
     MQTTCacheService,
     MQTTUtilsService,
-    MetricsService,
-    PrometheusService
+    MetricsService
+    // PrometheusService
   ],
 })
 export class AppModule {

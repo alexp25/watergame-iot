@@ -3,7 +3,7 @@ import { Config, IMQTTSubTopic } from "../../classes/global/config";
 import { MQTTCacheService } from "./cache.service";
 import { MQTTUtilsService, ICsvSensorData } from "./utils.service";
 import { SensorsDataService } from "../sensors/data.service";
-import { PrometheusService } from "../../classes/prometheus/prometheus.service";
+// import { PrometheusService } from "../../classes/prometheus/prometheus.service";
 import { Gauge } from "prom-client";
 
 const mqtt = require('mqtt')
@@ -66,10 +66,10 @@ export class MQTTCoreService {
     constructor(
         private cache: MQTTCacheService,
         private utils: MQTTUtilsService,
-        private prometheusService: PrometheusService,
+        // private prometheusService: PrometheusService,
         public sd: SensorsDataService
     ) {
-        this.heartBeatGauge = prometheusService.registerGauge("heart_beat", "timestamp last heartbeat was received", ["sensor_id"]);
+        // this.heartBeatGauge = prometheusService.registerGauge("heart_beat", "timestamp last heartbeat was received", ["sensor_id"]);
     }
 
     connect() {
@@ -102,7 +102,7 @@ export class MQTTCoreService {
             message = message.toString();
             if (this.debug)
                 console.log('received message via topic: ', topic, " - ", message);
-            this.checkHeartBeat(topic, message)
+            // this.checkHeartBeat(topic, message)
             this.checkUpdateCache(topic, message);
             if (Config.env.mqtt.record) {
                 this.checkRecorder(topic, message);

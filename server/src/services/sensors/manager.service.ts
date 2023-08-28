@@ -47,13 +47,16 @@ export class SensorsManagerService {
     /**
      * get all users with pagination
      */
-    getSensors(type: number): Promise<IDBModelSensor[]> {
+    getSensors(type: number, online: boolean): Promise<IDBModelSensor[]> {
         let promise: Promise<IDBModelSensor[]> = new Promise((resolve, reject) => {
             let where: IDBModelSensor = {
 
             };
             if (type != null && !Number.isNaN(type)) {
                 where.sensorTypeCode = type;
+            }
+            if (online) {
+                where.online = 1;
             }
             this.dbs.run(
                 this.dbs.db.sensor.findAll({
