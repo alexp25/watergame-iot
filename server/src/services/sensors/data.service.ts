@@ -62,7 +62,8 @@ export class SensorsDataService {
                 let tsCrt = null;
                 let pack = true;
 
-                if (!chan && pack) {
+                // if ((chan == null) && pack) {
+                if (pack) {
                     // pack channels, group by timestamp
                     for (let d of data) {
                         if (tsCrt != d.timestamp) {

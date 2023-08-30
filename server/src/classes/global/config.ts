@@ -25,7 +25,15 @@ export interface IConfigEnv {
         topics: {
             sub: IMQTTSubTopic[]
         }
+    },
+    service: {
+        cs: ISpecService
     }
+}
+
+export interface ISpecService {
+    url: string,
+    token: string
 }
 
 

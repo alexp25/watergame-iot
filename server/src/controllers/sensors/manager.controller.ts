@@ -3,11 +3,11 @@ import { ApiUseTags, ApiResponse, ApiModelProperty } from '@nestjs/swagger';
 import { Response } from 'express';
 import { IGenericResponseWrapper } from '../../classes/generic/response';
 import { GenericRequestService } from '../../services/generic-request.service';
-import { IApiGenericRequest } from '../../classes/generic/request';
+import { IApiGenericRequest, IApiGenericRequestUserId } from '../../classes/generic/request';
 import { SensorsManagerService } from '../../services/sensors/manager.service';
 
 
-export class IApiGetAllSensorsRequest extends IApiGenericRequest {
+export class IApiGetAllSensorsRequest extends IApiGenericRequestUserId {
     @ApiModelProperty({
         example: 1,
         default: 1
@@ -107,7 +107,7 @@ export class SensorsManagerController {
         type: null,
     })
     async getDataWGet(@Res() res: Response, @Query() query: IApiGetAllSensorsRequest) {
-        this.genericRequest.run(this.sensors.getSensors(Number.parseInt(query.type as any), (query.online as any) === "true")).then((resp: IGenericResponseWrapper<any>) => {
+        this.genericRequest.run(this.sensors.getSensors(Number.parseInt(query.userId as any), Number.parseInt(query.type as any), (query.online as any) === "true")).then((resp: IGenericResponseWrapper<any>) => {
             res.status(resp.status).json(resp.resp);
         }).catch((errorResp: IGenericResponseWrapper<any>) => {
             res.status(errorResp.status).json(errorResp.resp);

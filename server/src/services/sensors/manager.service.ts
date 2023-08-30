@@ -6,7 +6,12 @@ import { DBQueryService } from "../db/query.service";
 import { Order } from "sequelize";
 import { Op } from "sequelize";
 import { IFindOptionsExt } from "../../classes/global/db";
+import { Config, ISpecService } from "../../classes/global/config";
 
+import fetch from 'node-fetch';
+import { RequestInfo, RequestInit, Response } from 'node-fetch'
+import { IDBModelUserSensor } from "../../database/models-ts-inter";
+import { IGenericResponse } from "../../classes/generic/response";
 @Injectable()
 export class SensorsManagerService {
 
@@ -45,10 +50,10 @@ export class SensorsManagerService {
     }
 
     /**
-     * get all users with pagination
+     * get all sensors for user
      */
-    getSensors(type: number, online: boolean): Promise<IDBModelSensor[]> {
-        let promise: Promise<IDBModelSensor[]> = new Promise((resolve, reject) => {
+    getSensors(userId: number, type: number, online: boolean): Promise<IDBModelSensor[]> {
+        let promise: Promise<IDBModelSensor[]> = new Promise(async (resolve, reject) => {
             let where: IDBModelSensor = {
 
             };
@@ -57,6 +62,26 @@ export class SensorsManagerService {
             }
             if (online) {
                 where.online = 1;
+            }
+
+            if (userId != null) {
+                let service: ISpecService = Config.env.service.cs;
+                let url: RequestInfo = service.url + "/user/sensors/get-sensors?userId=" + userId;
+                let options: RequestInit = {
+                    method: 'GET',
+                    body: null,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apiKey': 'CSCpT2iBwJvqsAnts1C6dMQc76gIWWXP',
+                        'Authorization': service.token
+                    }
+                };
+                let res: Response = await fetch(url, options);
+                let data: IGenericResponse<IDBModelUserSensor[]> = await res.json();
+                let sensors: IDBModelUserSensor[] = data.data;
+                if (sensors && sensors.length > 0) {
+                    where.sensorId = sensors.map(s => s.sensorId) as any;
+                }
             }
             this.dbs.run(
                 this.dbs.db.sensor.findAll({

@@ -12,11 +12,12 @@ sudo systemctl stop hello_env
 sudo systemctl restart hello_env
 
 # start when the machine boots
-sudo systemtl enable hello_env
+sudo systemctl enable hello_env
 sudo systemctl disable hello_env
 
 # view logs
 journalctl -u hello_env.service -n 100
+
 
 
 # check for failed to start services
